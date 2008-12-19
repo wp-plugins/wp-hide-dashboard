@@ -42,12 +42,10 @@ Support is provided at http://www.kpdesign.net/wp-plugins/wp-hide-dashboard/
 
 == History ==
 
-Version 1.1:
-
+**Version 1.1:**  
 - Added WordPress version checking.
 - Added code for defining path to /wp-content/plugins/ if outside the WordPress directory.
 - Added removal of Tools menu and collapsible arrow from the menu area in 2.7.
 
-Version 1.0:
-
+**Version 1.0:**  
 - Initial release
