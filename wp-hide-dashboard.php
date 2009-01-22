@@ -2,13 +2,13 @@
 /*
 Plugin Name: WP Hide Dashboard
 Plugin URI: http://www.kpdesign.net/wp-plugins/wp-hide-dashboard/
-Description: Simple plugin that removes the Dashboard menu and the Tools menu, and prevents Dashboard access to users assigned to the <em>Subscriber</em> role. Useful if you allow your subscribers to edit their own profiles, but don't want them wandering around your WordPress admin section. Based on the <a title="IWG Hide Dashboard" href="http://www.im-web-gefunden.de/wordpress-plugins/iwg-hide-dashboard/">IWG Hide Dashboard</a> plugin by Thomas Schneider.
+Description: Simple plugin that removes the Dashboard menu, the Tools menu, and the Help link on the Profile page, and prevents Dashboard access to users assigned to the <em>Subscriber</em> role. Useful if you allow your subscribers to edit their own profiles, but don't want them wandering around your WordPress admin section. Based on the <a title="IWG Hide Dashboard" href="http://www.im-web-gefunden.de/wordpress-plugins/iwg-hide-dashboard/">IWG Hide Dashboard</a> plugin by Thomas Schneider.
 Author: Kim Parsell
 Author URI: http://www.kpdesign.net/
-Version: 1.1
+Version: 1.2
 License: MIT License - http://www.opensource.org/licenses/mit-license.php
 
-Copyright (c) 2008 Kim Parsell
+Copyright (c) 2008-2009 Kim Parsell
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -42,6 +42,18 @@ if (!defined('WP_CONTENT_DIR')) define('WP_CONTENT_DIR', ABSPATH.'wp-content');
 if (!defined('WP_PLUGIN_URL')) define('WP_PLUGIN_URL', WP_CONTENT_URL.'/plugins');
 if (!defined('WP_PLUGIN_DIR')) define('WP_PLUGIN_DIR', WP_CONTENT_DIR.'/plugins');
 
+/* WordPress actions */
+add_action('admin_head', 'wphd_hide_help_link', 0);
+add_action('admin_head', 'wphd_hide_dashboard', 0);
+add_action('admin_head', 'wphd_admin_redirect', 0);
+
+/* Hide help menu */
+function wphd_hide_help_link() {
+	if (!current_user_can('edit_posts')) {
+		echo "\n" . '<style type="text/css" media="screen">#screen-meta { display: none; }</style>' . "\n";
+	}
+}
+
 /* Check for current WordPress version */
 function wphd_hide_dashboard_version($test_version) {
 	$wp_version = get_bloginfo('version');
@@ -55,7 +67,7 @@ function wphd_hide_dashboard() {
 	if (!current_user_can('edit_posts')) {
 		if (0 <= wphd_hide_dashboard_version('2.6')) {
 			unset($menu[0]);
-		} else if (0 == wphd_hide_dashboard_version('2.7')) {
+		} else if (0 >= wphd_hide_dashboard_version('2.7')) {
 			unset($menu[0]);
 			unset($menu[4]);
 			unset($menu[55]);
@@ -75,7 +87,7 @@ function wphd_admin_redirect() {
 			$wphd_hide_dashboard_url = get_option('siteurl') . "/wp-admin/profile.php";
 ?>
 <meta http-equiv="refresh" content="0; url=<?php echo $wphd_hide_dashboard_url; ?>">
-<script type="text/javascript">document.location.href = "<?php echo $wphd_hide_dashboard_url; ?>"</script>
+<script type="text/javascript">document.location.href="<?php echo $wphd_hide_dashboard_url; ?>"</script>
 </head>
 
 <body></body>
@@ -85,8 +97,5 @@ function wphd_admin_redirect() {
 		}
 	}
 }
-
-add_action('admin_head', 'wphd_hide_dashboard', 0);
-add_action('admin_head', 'wphd_admin_redirect', 0);
 
 ?>

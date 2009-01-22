@@ -4,13 +4,13 @@ Donate link: http://www.kpdesign.net/wp-plugins/wp-hide-dashboard/
 Tags: admin, administration, dashboard, hide
 Requires at least: 2.5
 Tested up to: 2.7
-Stable tag: 1.1
+Stable tag: 1.2
 
 Hide the Dashboard link (2.5+) and Tools menu (2.7) from your blog subscribers when they are logged in.
 
 == Description ==
 
-This plugin removes the Dashboard link and the Tools menu, and prevents access to the Dashboard for users assigned to the `Subscriber` role. This is useful if you want to allow your subscribers to edit their own profiles, but don't want them wandering around the rest of your WordPress admin section.
+This plugin removes the Dashboard menu, the Tools menu, and the Help link on the Profile page, and prevents Dashboard access to users assigned to the <em>Subscriber</em> role. Useful if you allow your subscribers to edit their own profiles, but don't want them wandering around your WordPress admin section. Based on the <a title="IWG Hide Dashboard" href="http://www.im-web-gefunden.de/wordpress-plugins/iwg-hide-dashboard/">IWG Hide Dashboard</a> plugin by Thomas Schneider.
 
 Users belonging to any of the other WordPress roles will continue to see the Dashboard link and the Tools menu, and have access to the other sections of the WordPress admin that corresponds to their role's capabilities.
 
@@ -42,10 +42,13 @@ Support is provided at http://www.kpdesign.net/wp-plugins/wp-hide-dashboard/
 
 == History ==
 
-**Version 1.1:**  
-- Added WordPress version checking.  
-- Added code for defining path to /wp-content/plugins/ if outside the WordPress directory.  
+Version 1.2:
+- Added removal of Help link on Profile page
+
+Version 1.1:
+- Added WordPress version checking.
+- Added code for defining path to /wp-content/plugins/ if outside the WordPress directory.
 - Added removal of Tools menu and collapsible arrow from the menu area in 2.7.
 
-**Version 1.0:**  
+Version 1.0:
 - Initial release
