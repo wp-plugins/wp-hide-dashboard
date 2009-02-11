@@ -5,7 +5,7 @@ Plugin URI: http://www.kpdesign.net/wp-plugins/wp-hide-dashboard/
 Description: Simple plugin that removes the Dashboard menu, the Tools menu, and the Help link on the Profile page, and prevents Dashboard access to users assigned to the <em>Subscriber</em> role. Useful if you allow your subscribers to edit their own profiles, but don't want them wandering around your WordPress admin section. Based on the <a title="IWG Hide Dashboard" href="http://www.im-web-gefunden.de/wordpress-plugins/iwg-hide-dashboard/">IWG Hide Dashboard</a> plugin by Thomas Schneider.
 Author: Kim Parsell
 Author URI: http://www.kpdesign.net/
-Version: 1.2
+Version: 1.3
 License: MIT License - http://www.opensource.org/licenses/mit-license.php
 
 Copyright (c) 2008-2009 Kim Parsell
@@ -32,7 +32,7 @@ THE SOFTWARE.
 
 /* Disallow direct access to the plugin file */
 if (basename($_SERVER['PHP_SELF']) == basename (__FILE__)) {
-die("Sorry, but you can't access this page directly.");
+	die("Sorry, but you can't access this page directly.");
 }
 
 /* Define path to /wp-content/plugins/ */
