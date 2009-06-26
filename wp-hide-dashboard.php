@@ -5,7 +5,7 @@ Plugin URI: http://www.kpdesign.net/wp-plugins/wp-hide-dashboard/
 Description: Simple plugin that removes the Dashboard menu, the Tools menu, and the Help link on the Profile page, and prevents Dashboard access to users assigned to the <em>Subscriber</em> role. Useful if you allow your subscribers to edit their own profiles, but don't want them wandering around your WordPress admin section. Based on the <a title="IWG Hide Dashboard" href="http://www.im-web-gefunden.de/wordpress-plugins/iwg-hide-dashboard/">IWG Hide Dashboard</a> plugin by Thomas Schneider.
 Author: Kim Parsell
 Author URI: http://www.kpdesign.net/
-Version: 1.3
+Version: 1.4
 License: MIT License - http://www.opensource.org/licenses/mit-license.php
 
 Copyright (c) 2008-2009 Kim Parsell
@@ -60,7 +60,7 @@ function wphd_hide_dashboard_version($test_version) {
 	return version_compare($test_version, $wp_version);
 }
 
-/* Hide the Dashboard link (2.5+) and the Tools menu (2.7) */
+/* Hide the Dashboard link (2.5+) and the Tools menu (2.7+) */
 function wphd_hide_dashboard() {
 	global $menu, $current_user;
 
@@ -68,9 +68,10 @@ function wphd_hide_dashboard() {
 		if (0 <= wphd_hide_dashboard_version('2.6')) {
 			unset($menu[0]);
 		} else if (0 >= wphd_hide_dashboard_version('2.7')) {
-			unset($menu[0]);
-			unset($menu[4]);
-			unset($menu[55]);
+			unset($menu[0]);		/* Hides Dashboard menu */
+			unset($menu[4]);		/* Hides arrow separator under Dashboard link in 2.7+*/
+			unset($menu[55]);		/* Hides Tools menu in 2.7 and 2.7.1 */
+			unset($menu[75]);		/* Hides Tools menu in 2.8 */
 		}
 	}
 }
@@ -84,7 +85,7 @@ function wphd_admin_redirect() {
 			wp_redirect('profile.php');
 			exit();
 		} else {
-			$wphd_hide_dashboard_url = get_option('siteurl') . "/wp-admin/profile.php";
+			$wphd_hide_dashboard_url = get_option('siteurl').'/wp-admin/profile.php';
 ?>
 <meta http-equiv="refresh" content="0; url=<?php echo $wphd_hide_dashboard_url; ?>">
 <script type="text/javascript">document.location.href="<?php echo $wphd_hide_dashboard_url; ?>"</script>

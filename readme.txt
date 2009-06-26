@@ -3,10 +3,10 @@ Contributors: kpdesign
 Donate link: http://www.kpdesign.net/wp-plugins/wp-hide-dashboard/
 Tags: admin, administration, dashboard, hide
 Requires at least: 2.5
-Tested up to: 2.7
-Stable tag: 1.3
+Tested up to: 2.8.1-beta1
+Stable tag: 1.4
 
-Hide the Dashboard link (2.5+) and Tools menu (2.7) from your blog subscribers when they are logged in.
+Hide the Dashboard link (2.5+), Tools menu and Help link (2.7+) from your blog subscribers when they are logged in.
 
 == Description ==
 
@@ -29,29 +29,44 @@ This plugin relies only on core WordPress capabilities.
 
 == Frequently Asked Questions ==
 
-None
+Q. How do I change this to hide the dashboard and tools menu and help options from other roles besides Subscriber?
+
+A. To hide these from other roles, you will need to edit the plugin in a plain text editor and make the following changes:
+
+* Subscriber -> Contributor: Change `!current_user_can('edit_posts')` to `!current_user_can('upload_files')`
+* Subscriber -> Author: Change `!current_user_can('edit_posts')` to `!current_user_can('create_users')`
+* Subscriber -> Editor: Change `!current_user_can('edit_posts')` to `!current_user_can('manage_options')`
+
+There are 3 instances of this code in the plugin (lines 52, 67, and 83 in version 1.4) - make sure you change all of them.
+
+Q. Will you be creating an admin option page to allow specifying what role we want to hide these from?
+
+A. I have this on the to-do list for the plugin, and am working on it for a future release. In the meantime, you will still need to edit the plugin manually to change the role.
 
 == Screenshots ==
 
-1. Screenshot of the upper-left portion of 2.6 admin section
-2. Screenshot of the upper-left portion of 2.7 admin section
+1. Upper-left portion of 2.7/2.8 admin section
 
 == Support ==
 
-Support is provided at http://www.kpdesign.net/wp-plugins/wp-hide-dashboard/
+Support is provided at: http://www.kpdesign.net/wp-plugins/wp-hide-dashboard/
 
-== History ==
+== Changelog ==
 
-**Version 1.3:**  
-- Fixed error in WordPress version checking.
+= Version 1.4: =
+* Added code to remove Tools menu in 2.8.x (menu numbering changed in core).
+* Added Frequently Asked Questions and proper Changelog sections to readme.txt file.
 
-**Version 1.2:**  
-- Added removal of Help link on Profile page.
+= Version 1.3: =
+* Fixed error in WordPress version checking.
 
-**Version 1.1:**  
-- Added WordPress version checking.  
-- Added code for defining path to /wp-content/plugins/ if outside the WordPress directory.  
-- Added removal of Tools menu and collapsible arrow from the menu area in 2.7.
+= Version 1.2: =
+* Added removal of Help link on Profile page.
 
-**Version 1.0:**  
-- Initial release
+= Version 1.1: =
+* Added WordPress version checking.
+* Added code for defining path to /wp-content/plugins/ if outside the WordPress directory.
+* Added removal of Tools menu and collapsible arrow from the menu area in 2.7.x.
+
+= Version 1.0: =
+* Initial release
