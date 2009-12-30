@@ -3,8 +3,8 @@ Contributors: kpdesign
 Donate link: http://www.kpdesign.net/wp-plugins/wp-hide-dashboard/
 Tags: admin, administration, dashboard, hide
 Requires at least: 2.5
-Tested up to: 2.8.1-beta1
-Stable tag: 1.4
+Tested up to: 2.9.x
+Stable tag: 1.5
 
 Hide the Dashboard link (2.5+), Tools menu and Help link (2.7+) from your blog subscribers when they are logged in.
 
@@ -18,6 +18,27 @@ Based on the [IWG Hide Dashboard](http://www.im-web-gefunden.de/wordpress-plugin
 
 This plugin relies only on core WordPress capabilities.
 
+= Works With: =
+
+The following is a list of role/content management plugins that work well (no conflicts) with the WP Hide Dashboard plugin:
+
+* [Members](http://wordpress.org/extend/plugins/members/ "Members") by Justin Tadlock
+* [wpNamedUsers](http://wordpress.sundskard.dk/archives/category/wpnamedusers "wpNamedUsers") by Andrias Sundskard
+
+= Known Conflicts: =
+
+The following is a list of role/content management plugins that are known to have conflicts with the WP Hide Dashboard plugin:
+
+* [Role Manager](http://www.im-web-gefunden.de/wordpress-plugins/role-manager/ "Role Manager") (Use the [IWG Hide Dashboard](http://www.im-web-gefunden.de/wordpress-plugins/iwg-hide-dashboard/ "IWG Hide Dashboard") plugin to hide the dashboard link.)
+* [Role Scoper](http://wordpress.org/extend/plugins/role-scoper/ "Role Scoper")
+* [Flutter](http://wordpress.org/extend/plugins/fresh-page/ "Flutter")
+
+Note: Please let me know if there are other plugins that conflict with WP Hide Dashboard, and I'll add them to the list.
+
+= Support: =
+
+Support is provided at: http://www.kpdesign.net/wp-plugins/wp-hide-dashboard/
+
 == Installation ==
 
 = Installation Instructions: =
@@ -29,29 +50,48 @@ This plugin relies only on core WordPress capabilities.
 
 == Frequently Asked Questions ==
 
-Q. How do I change this to hide the dashboard and tools menu and help options from other roles besides Subscriber?
+Below are a couple of the most frequently asked questions.
+
+Check out http://www.kpdesign.net/wp-plugins/wp-hide-dashboard/ for the full FAQ.
+
+**Q. How do I change this to hide the Dashboard link, Tools menu and Help options from other roles besides Subscriber?**
 
 A. To hide these from other roles, you will need to edit the plugin in a plain text editor and make the following changes:
 
+**Version 1.5**
+
+You will need to change the capability in lines 44:
+
+`/* Plugin config - user capability for the top level you want to hide everything from */
+$wphd_user_capability = 'edit_posts'; /* [default for subscriber level = edit_posts] */`
+
+* Subscriber -> Contributor: Change `edit_posts` to `upload_files`
+* Subscriber -> Author: Change `edit_posts` to `manage_categories`
+* Subscriber -> Editor: Change `edit_posts` to `manage_options`
+
+**Version 1.4 and below:**
+
+There are 3 instances of this code in the plugin - make sure you change all of them.
+
 * Subscriber -> Contributor: Change `!current_user_can('edit_posts')` to `!current_user_can('upload_files')`
-* Subscriber -> Author: Change `!current_user_can('edit_posts')` to `!current_user_can('create_users')`
+* Subscriber -> Author: Change `!current_user_can('edit_posts')` to `!current_user_can('manage_categories')`
 * Subscriber -> Editor: Change `!current_user_can('edit_posts')` to `!current_user_can('manage_options')`
 
-There are 3 instances of this code in the plugin (lines 52, 67, and 83 in version 1.4) - make sure you change all of them.
+**Q. Will you be creating an admin option page to allow specifying what role we want to hide these from?**
 
-Q. Will you be creating an admin option page to allow specifying what role we want to hide these from?
-
-A. I have this on the to-do list for the plugin, and am working on it for a future release. In the meantime, you will still need to edit the plugin manually to change the role.
+A. I have this on the to-do list for the plugin, to be included in a future release. In the meantime, you will still need to edit the plugin manually.
 
 == Screenshots ==
 
-1. Upper-left portion of 2.7/2.8 admin section
-
-== Support ==
-
-Support is provided at: http://www.kpdesign.net/wp-plugins/wp-hide-dashboard/
+1. Upper-left portion of 2.7/2.8/2.9 admin section
 
 == Changelog ==
+
+= Version 1.5: =
+* Added code to make it easier to configure plugin if you want to change the role/capability level.
+* Added code to remove Tools menu.
+* Added code to remove Settings, Media and Comments menus for Contributors+ if needed
+* Added code to remove WordPress upgrade nag notice (admin will still see the notice).
 
 = Version 1.4: =
 * Added code to remove Tools menu in 2.8.x (menu numbering changed in core).
@@ -70,3 +110,8 @@ Support is provided at: http://www.kpdesign.net/wp-plugins/wp-hide-dashboard/
 
 = Version 1.0: =
 * Initial release
+
+== Upgrade Notice ==
+
+= Version 1.5: =
+Added code to enable easier configuration, remove other menus per user requests.
