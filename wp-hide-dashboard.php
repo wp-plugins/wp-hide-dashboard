@@ -1,14 +1,16 @@
 <?php
 /*
 Plugin Name: WP Hide Dashboard
-Plugin URI: http://www.kpdesign.net/wp-plugins/wp-hide-dashboard/
-Description: Simple plugin that removes the Dashboard menu, the Tools menu, and the Help link on the Profile page, and prevents Dashboard access to users assigned to the <em>Subscriber</em> role. Useful if you allow your subscribers to edit their own profiles, but don't want them wandering around your WordPress admin section. Based on the <a title="IWG Hide Dashboard" href="http://www.im-web-gefunden.de/wordpress-plugins/iwg-hide-dashboard/">IWG Hide Dashboard</a> plugin by Thomas Schneider.
+Plugin URI: http://kpdesign.net/wp-plugins/wp-hide-dashboard/
+Description: A simple plugin that removes the Dashboard menu, the Tools menu, the Personal Options section and the Help link on the Profile page, and prevents Dashboard access to users assigned to the <em>Subscriber</em> role. Useful if you allow your subscribers to edit their own profiles, but don't want them wandering around your WordPress admin section. Note: This version requires a minimum of WordPress 2.9. If you are running a version less than that, please upgrade your WordPress install now.
 Author: Kim Parsell
-Author URI: http://www.kpdesign.net/
-Version: 1.5
+Author URI: http://kpdesign.net/
+Version: 2.0
 License: MIT License - http://www.opensource.org/licenses/mit-license.php
 
 Copyright (c) 2008-2010 Kim Parsell
+Personal Options removal code: Copyright (c) 2010 Large Interactive, LLC, Author: Matthew Pollotta
+Based on IWG Hide Dashboard plugin by Thomas Schneider, Copyright (c) 2008 (http://www.im-web-gefunden.de/wordpress-plugins/iwg-hide-dashboard/)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this
 software and associated documentation files (the "Software"), to deal in the Software
@@ -41,69 +43,63 @@ if (!defined('WP_PLUGIN_URL')) define('WP_PLUGIN_URL', WP_CONTENT_URL.'/plugins'
 if (!defined('WP_PLUGIN_DIR')) define('WP_PLUGIN_DIR', WP_CONTENT_DIR.'/plugins');
 
 /* Plugin config - user capability for the top level you want to hide everything from */
-$wphd_user_capability = 'edit_posts'; /* [default for subscriber level = edit_posts] */
+$wphd_user_capability = 'edit_posts'; /* [default for Subscriber role = edit_posts] */
 
-/* WordPress actions */
-add_action('admin_head', 'wphd_hide_help_link', 0);
+/* Hide the Dashboard link, Help menu, Favorites menu, Upgrade notice, and now the Personal Options section too!
+	Major thanks to Matt Pollotta of Large Interactive for allowing me to incorporate the functionality from his Hide Personal Options plugin
+	(http://matt.largeinteractive.com/removing-personal-options-from-wordpress/28/) into WP Hide Dashboard. More features FTW! */
+
 add_action('admin_head', 'wphd_hide_dashboard', 0);
-add_action('admin_head', 'wphd_admin_redirect', 0);
 
-/* Hide Help menu, Favorites menu, Upgrade notice, Keyboard shortcuts link (for Contributors+)) */
-function wphd_hide_help_link() {
-	global $current_user, $wphd_user_capability;
-
-	if (!current_user_can(''.$wphd_user_capability.'')) {
-		echo "\n" . '<style type="text/css" media="screen">#update-nag, #screen-meta, .turbo-nag, #favorite-actions, #your-profile .form-table a { display: none; }</style>' . "\n";
-	}
-}
-
-/* Check for current WordPress version */
-function wphd_hide_dashboard_version($test_version) {
-	$wp_version = get_bloginfo('version');
-	return version_compare($test_version, $wp_version);
-}
-
-/* Hide the Dashboard link (2.5+) and the Tools menu (2.7+) for Subscribers; Settings, Media and Comments menu for Contributors+. */
 function wphd_hide_dashboard() {
-	global $menu, $current_user, $wphd_user_capability;
+	global $current_user, $menu, $parent_file, $wphd_user_capability, $wp_db_version;
 
+	/* First, let's get rid of the Help menu, update nag, Turbo nag, Favorites menu, Personal Options section */
 	if (!current_user_can(''.$wphd_user_capability.'')) {
-		if (0 <= wphd_hide_dashboard_version('2.6')) {
-			unset($menu[0]);
-		} else if (0 >= wphd_hide_dashboard_version('2.7')) {
-			unset($menu[0]);		/* Hides Dashboard menu */
-			unset($menu[4]);		/* Hides arrow separator under Dashboard link in 2.7+ */
-			unset($menu[10]);		/* Hides Media menu (contributors +) */
-			unset($menu[25]);		/* Hides Comments menu (contributors +) */
-			unset($menu[55]);		/* Hides Tools menu in 2.7 and 2.7.1 */
-			unset($menu[75]);		/* Hides Tools menu in 2.8 */
-			unset($menu[80]);		/* Hides Settings menu (contributors +) */
-			unset($menu[9999]);	/* Hides top-level menu for Pods plugin */
-		}
-	}
-}
 
-/* Redirect unauthorized users to their profile page if attempting to access dashboard with direct url */
-function wphd_admin_redirect() {
-	global $parent_file, $current_user, $wphd_user_capability;
+		/* For folks still on 2.9/2.9.1/2.9.2. You really should upgrade, you know that, right? */
+		if ($wp_db_version === 12329) { /* This is WordPress 2.9, 2.9.1, 2.9.2 */
+			echo "\n" . '<style type="text/css" media="screen">#your-profile { display: none; } #update-nag, #screen-meta, .turbo-nag, #favorite-actions { display: none !important; }</style>';
+			echo "\n" . '<script type="text/javascript" src="'.WP_PLUGIN_URL.'/wp-hide-dashboard/wphd-hpo.js"></script>' . "\n";
+		}
+
+		/* For folks running 3.0 or higher, some leaner code. Don't need to remove Turbo link or Favorites menu any longer.
+			Gears support and Turbo link were removed in changeset 11301: http://core.trac.wordpress.org/ticket/11301.
+			Favorites menu is hidden by default for Subscribers in version 3.0. */
+		else if ($wp_db_version >= 15260) { /* This is WordPress 3.0 */
+			echo "\n" . '<style type="text/css" media="screen">#your-profile { display: none; } #update-nag, #screen-meta { display: none !important; }</style>';
+			echo "\n" . '<script type="text/javascript" src="'.WP_PLUGIN_URL.'/wp-hide-dashboard/wphd-hpo.js"></script>' . "\n";
+		}
+
+	/* Now, let's fix the admin menu. */
+
+		/* First let's take care of the actual Dashboard link. The Dashboard link menu numbers are different in 2.9.x and 3.0. */
+		if ($wp_db_version === 12329) { /* This is WordPress 2.9, 2.9.1, 2.9.2 */
+			unset($menu[0]);		/* Hides Dashboard menu in 2.9.x and under*/
+		} else if ($wp_db_version >= 15260) { /* This is WordPress 3.0 */
+			unset($menu[2]);		/* Hides Dashboard menu in 3.0 */
+		}
+
+		/* Now on to the rest of the menu. */
+		unset($menu[4]);		/* Hides arrow separator under Dashboard link */
+		unset($menu[10]);		/* Hides Media menu (contributors +) */
+		unset($menu[25]);		/* Hides Comments menu (contributors +) */
+		unset($menu[75]);		/* Hides Tools menu in 2.9.x. This is now hidden from Subscribers by default in 3.0, courtesy of changeset 11301 (thanks @nacin). */
+		unset($menu[80]);		/* Hides Settings menu (contributors +) */
+		unset($menu[9999]);	/* Hides top-level menu for Pods plugin */
+	}
+
+	/* Last, but not least, let's redirect folks to their profile when they login or if they try to access the dashboard via direct URL */
 
 	if (!current_user_can(''.$wphd_user_capability.'') && $parent_file == 'index.php') {
-		if (!headers_sent()) {
-			wp_redirect('profile.php');
-			exit();
+		if (headers_sent()) {
+			echo '<meta http-equiv="refresh" content="0;url='.admin_url('profile.php').'">';
+			echo '<script type="text/javascript">document.location.href="'.admin_url('profile.php').'"</script>';
 		} else {
-			$wphd_hide_dashboard_url = get_option('siteurl').'/wp-admin/profile.php';
-?>
-<meta http-equiv="refresh" content="0; url=<?php echo $wphd_hide_dashboard_url; ?>">
-<script type="text/javascript">document.location.href="<?php echo $wphd_hide_dashboard_url; ?>"</script>
-</head>
-
-<body></body>
-</html>
-<?php
-			exit();
+			wp_redirect(admin_url('profile.php'));
 		}
 	}
-}
+
+} /* That's all folks. You were expecting more? */
 
 ?>
