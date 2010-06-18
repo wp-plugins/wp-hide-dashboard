@@ -67,7 +67,7 @@ function wphd_hide_dashboard() {
 			Gears support and Turbo link were removed in changeset 11301: http://core.trac.wordpress.org/ticket/11301.
 			Favorites menu is hidden by default for Subscribers in version 3.0. */
 		else if ($wp_db_version >= 15260) { /* This is WordPress 3.0 */
-			echo "\n" . '<style type="text/css" media="screen">#your-profile { display: none; } #update-nag, #screen-meta { display: none !important; }</style>';
+			echo "\n" . '<style type="text/css" media="screen">#your-profile { display: none; } .update-nag, #screen-meta { display: none !important; }</style>';
 			echo "\n" . '<script type="text/javascript" src="'.WP_PLUGIN_URL.'/wp-hide-dashboard/wphd-hpo.js"></script>' . "\n";
 		}
 
