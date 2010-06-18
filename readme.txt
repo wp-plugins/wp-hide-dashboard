@@ -58,7 +58,7 @@ Check out http://kpdesign.net/wp-plugins/wp-hide-dashboard/ for the full FAQ.
 
 A. To hide these from other roles, you will need to edit the plugin in a plain text editor and make the following changes:
 
-**Version 1.5 and up**
+**Version 1.5 and up:**
 
 You will need to change the capability (line 44 in version 1.5, and line 46 in version 2.0):
 
