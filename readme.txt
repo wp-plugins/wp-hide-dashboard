@@ -58,7 +58,7 @@ If installing the plugin in the `/wp-content/mu-plugins/` directory:
 
 1. Download the plugin and unzip it to a folder on your computer.
 2. Upload the wp-hide-dashboard.php file to the `/wp-content/mu-plugins/` directory.
-3. The plugin will automatically run – there is no activation or configuration needed.
+3. The plugin will automatically run - there is no activation or configuration needed.
 
 == Frequently Asked Questions ==
 
