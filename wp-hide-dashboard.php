@@ -1,14 +1,14 @@
 <?php
 /*
 Plugin Name: WP Hide Dashboard
-Plugin URI: http://kpdesign.net/wphidedash/
-Description: A simple plugin that removes the Dashboard menu, the Personal Options section and the Help link on the Profile page, hides the Dashboard links in the admin bar menu (if activated), and prevents Dashboard access to users assigned to the <em>Subscriber</em> role. Useful if you allow your subscribers to edit their own profiles, but don't want them wandering around your WordPress admin section. <strong>Note: This version requires a minimum of WordPress 3.1. If you are running a version less than that, please upgrade your WordPress install now.</strong>
+Plugin URI: http://wphidedash.org/
+Description: A simple plugin that removes the Dashboard menu, the Personal Options section and the Help link on the Profile page, hides the Dashboard links in the toolbar menu (if activated), and prevents Dashboard access to users assigned to the <em>Subscriber</em> role. Useful if you allow your subscribers to edit their own profiles, but don't want them wandering around your WordPress admin section. <strong>Note: This version requires a minimum of WordPress 3.4. If you are running a version less than that, please upgrade your WordPress install now.</strong>
 Author: Kim Parsell
-Author URI: http://kpdesign.net/
-Version: 2.1
+Author URI: http://wphidedash.org/
+Version: 2.2
 License: MIT License - http://www.opensource.org/licenses/mit-license.php
 
-Copyright (c) 2008-2011 Kim Parsell
+Copyright (c) 2008-2012 Kim Parsell
 Personal Options removal code: Copyright (c) 2010 Large Interactive, LLC, Author: Matthew Pollotta
 Originally based on IWG Hide Dashboard plugin by Thomas Schneider, Copyright (c) 2008 (http://www.im-web-gefunden.de/wordpress-plugins/iwg-hide-dashboard/)
 
@@ -38,90 +38,138 @@ if (basename($_SERVER['PHP_SELF']) == basename (__FILE__)) {
 /* Plugin config - user capability for the top level you want to hide everything from */
 $wphd_user_capability = 'edit_posts'; /* [default for Subscriber role = edit_posts] */
 
-/* WordPress 3.1 introduces the admin bar in both the admin area and the public-facing site. For subscribers, there's also now
-	a pesky link to the Dashboard and a redundant link to the user's profile in the My Account menu. Let's remove the Dashboard
-	link and only show the Profile link on the site. */
+/* WordPress 3.1 introduced the toolbar in both the admin area and the public-facing site (if enabled). For subscribers, there's now a link
+	to the Dashboard when they are on the public-facing site. Let's remove the Dashboard link and customize the links in the admin bar. */
 
-function wphd_remove_admin_bar_links() {
-	global $blog, $current_user, $id, $wp_admin_bar, $wphd_user_capability;
+function wphd_custom_admin_bar_links() {
+	global $blog, $current_user, $id, $wp_admin_bar, $wphd_user_capability, $wp_db_version;
 
-	if ((!current_user_can(''.$wphd_user_capability.'') || !current_user_can_for_blog($blog->userblog_id, ''.$wphd_user_capability.'')) && is_admin_bar_showing()) {
+	if ($wp_db_version < 20596) {
+		return;
+
+	} else if ((!current_user_can(''.$wphd_user_capability.'')) && is_admin_bar_showing() && is_user_logged_in() && $wp_db_version >= 20596) {
+
+		/* If single site, remove Dashboard link on public-facing site and WordPress logo menu everywhere */
+		if (!is_multisite() && !is_admin()) {
+			$wp_admin_bar->remove_menu('dashboard');		/* Hide Dashboard link on public-facing site */
+		}
+		$wp_admin_bar->remove_menu('wp-logo');			/* Hide WordPress logo menu completely */
 
 		/* If Multisite, check whether they are assigned to any network sites before removing links */
 		$user_id = get_current_user_id();
 		$blogs = get_blogs_of_user($user_id);
-		if (is_multisite() && empty($blogs)) {
-			return;
-		} else if (is_admin() || is_blog_admin()) {
-			$wp_admin_bar->remove_menu('edit-my-profile');
-		}
-		$wp_admin_bar->remove_menu('dashboard');
 
-	}
+		if (is_multisite()) {
 
-}
+			/* Show only user account menu if the user is assigned to no sites. */
+			if (count($wp_admin_bar->user->blogs) == 0) {
+				$wp_admin_bar->remove_menu('wp-logo');			/* Hide WordPress logo menu completely */
+				return;
+			}
 
-add_action('admin_bar_menu', 'wphd_remove_admin_bar_links', 100);
+			/* Show single site menu if the user is assigned to only 1 site. */
+			if (count($wp_admin_bar->user->blogs) == 1) {
+				if (!is_admin()) {
+					$wp_admin_bar->remove_menu('dashboard');	/* Hide Dashboard link on public-facing site */
+				}
+				$wp_admin_bar->remove_menu('wp-logo');			/* Hide WordPress logo menu completely */
+				$wp_admin_bar->remove_menu('my-sites');			/* Hide My Sites menu */
+				return;
+			}
 
-/* There's also an admin bar menu in WordPress Multisite that lists all of the network sites that a user belongs to, which includes links
-	to each site's Dashboard. Let's remove the default menu and create one of our own that only links to the sites a user belongs to. */
+			/* Remove Dashboard and Visit Site links from My Sites menu if the user is assigned to two or more sites. */
+			if (count($wp_admin_bar->user->blogs) >= 2) {
+				$wp_admin_bar->remove_menu('dashboard');		/* Hide Dashboard link on public-facing site */
 
-function wphd_custom_my_sites_menu() {
-	global $blog, $current_user, $wpdb, $wp_admin_bar, $wphd_user_capability;
+				foreach ((array) $wp_admin_bar->user->blogs as $blog) {
+					$menu_d = 'blog-'.$blog->userblog_id.'-d';
+					$menu_v = 'blog-'.$blog->userblog_id.'-v';
 
-	if (is_multisite()) {
-		if (!current_user_can_for_blog($blog->userblog_id, ''.$wphd_user_capability.'') && is_admin_bar_showing() && is_user_logged_in()) {
-			/* Add custom My Sites menu if the user is assigned to one or more sites. */
-			if (count($wp_admin_bar->user->blogs) < 1)
+					$wp_admin_bar->remove_menu($menu_d);		/* Remove Dashboard link from My Sites menu*/
+					$wp_admin_bar->remove_menu($menu_v);		/* Remove Visit Site link from My Sites menu */
+				}
+
+				/* Change URL for each site from admin URL to site URL */
+				$menu_id  = 'blog-'.$blog->userblog_id;
+				$blavatar = '<div class="blavatar"></div>';
+
+				foreach ((array) $wp_admin_bar->user->blogs as $blog) {
+					$menu_id   = 'blog-'.$blog->userblog_id;
+					$blogname = ucfirst($blog->blogname);
+
+					$wp_admin_bar->add_menu(array(
+						'parent'  => 'my-sites-list',
+						'id'        => $menu_id,
+						'title' 	   => $blavatar.$blogname,
+						'href' 	   => get_site_url($blog->userblog_id))
+					);
+				}
+
 				return;
 
-			$wp_admin_bar->add_menu(array('id' => 'my-blogs', 'title' => __('My Sites'), 'href' => $null));
-
-			$default = includes_url('images/wpmini-blue.png');
-
-			foreach ((array) $wp_admin_bar->user->blogs as $blog) {
-				$blavatar = '<img src="'.esc_url($default).'" alt="'.esc_attr__('Blavatar').'" width="16" height="16" class="blavatar" />';
-				$blogname = empty( $blog->blogname ) ? $blog->domain : $blog->blogname;
-				$wp_admin_bar->add_menu(array('parent' => 'my-blogs', 'id' => 'blog-'.$blog->userblog_id, 'title' => $blavatar.$blogname, 'href' => get_home_url($blog->userblog_id)));
 			}
+
 		}
 
 	}
 
 }
 
-remove_action('admin_bar_menu', 'wp_admin_bar_my_sites_menu', 90);
-add_action('admin_bar_menu', 'wphd_custom_my_sites_menu', 100);
+add_action('wp_before_admin_bar_render', 'wphd_custom_admin_bar_links');
 
-/* Now for the admin sidebar menu and the profile page. Let's hide the Dashboard link, Help menu, Favorites menu, Upgrade notice, and
-	the Personal Options section. */
+/* Replace toolbar Dashboard link on public-facing site with link to the user's profile */
+
+function wphd_add_admin_bar_profile_link() {
+	global $blog, $current_user, $id, $wp_admin_bar, $wphd_user_capability, $wp_db_version;
+
+	if ($wp_db_version < 20596) {
+		return;
+
+	} else if ((!current_user_can(''.$wphd_user_capability.'')) && is_admin_bar_showing() && !is_admin() && $wp_db_version >= 20596) {
+		$wp_admin_bar->add_menu(array(
+			'parent' => 'site-name',
+			'id'       => 'profile',
+			'title'    => __('Profile'),
+			'href'    => admin_url('profile.php'),
+		));
+	}
+
+}
+
+add_action('admin_bar_menu', 'wphd_add_admin_bar_profile_link');
+
+/* Now for the admin sidebar menu and the profile page. Let's hide the Dashboard menu, Help menu, Upgrade notice, and Personal Options section. */
 
 function wphd_hide_dashboard() {
 	global $blog, $current_user, $id, $parent_file, $wphd_user_capability, $wp_db_version;
 
-	if ($wp_db_version < 17056) {
+	if ($wp_db_version < 20596) {
 		return;
 
-	} else if ((!current_user_can(''.$wphd_user_capability.'') || !current_user_can_for_blog($blog->userblog_id, ''.$wphd_user_capability.'')) && $wp_db_version >= 17056) {
+	} else if ((!current_user_can(''.$wphd_user_capability.'')) && $wp_db_version >= 20596) {
 
-		/* First, let's get rid of the Help menu, update nag, Personal Options section */
-		echo "\n" . '<style type="text/css" media="screen">#your-profile { display: none; } .update-nag, #screen-meta, .color-option, .show-admin-bar { display: none !important; }</style>';
+		/* First, let's get rid of the Help menu, Update nag, Personal Options section */
+		echo "\n" . '<style type="text/css" media="screen">#your-profile { display: none; } .update-nag, #contextual-help-wrap, #contextual-help-link-wrap { display: none !important; }</style>';
 		echo "\n" . '<script type="text/javascript">jQuery(document).ready(function($) { $(\'form#your-profile > h3:first\').hide(); $(\'form#your-profile > table:first\').hide(); $(\'form#your-profile\').show(); });</script>' . "\n";
 
 		/* Now, let's fix the sidebar admin menu - go away, Dashboard link. */
+
 		/* If Multisite, check whether they are in the User Dashboard before removing links */
+
 		$user_id = get_current_user_id();
 		$blogs = get_blogs_of_user($user_id);
-		if (is_multisite() && empty($blogs)) {
+
+		if (is_multisite() && is_admin() && empty($blogs)) {
 			return;
-		} else if (function_exists('remove_menu_page')) {
-			remove_menu_page('index.php');							/* Hides Dashboard menu in 3.1 */
-			remove_menu_page('separator1');							/* Hides arrow separator under Dashboard link in 3.1*/
-			remove_submenu_page('profile.php', 'profile.php');		/* Hides Profile submenu link in 3.1. Really don't need to see it twice, do we? */
+		} else {
+			remove_menu_page('index.php');		/* Hides Dashboard menu */
+			remove_menu_page('separator1');		/* Hides separator under Dashboard menu*/
 		}
 
+
 		/* Last, but not least, let's redirect folks to their profile when they login or if they try to access the Dashboard via direct URL */
-		if (is_multisite() && empty($blogs)) {
+
+		if (is_multisite() && is_admin() && empty($blogs)) {
 			return;
 		} else if ($parent_file == 'index.php') {
 			if (headers_sent()) {

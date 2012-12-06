@@ -1,29 +1,28 @@
 === WP Hide Dashboard ===
 Contributors: kpdesign
-Donate link: http://kpdesign.net/wphidedash/donate/
-Tags: admin, administration, dashboard, hide, multisite, buddypress
-Requires at least: 3.1
-Tested up to: 3.1
-Stable tag: 2.1
+Donate link: http://wphidedash.org/donate/
+Tags: admin, admin bar, administration, dashboard, hide, multisite, toolbar
+Requires at least: 3.4
+Tested up to: 3.5
+Stable tag: 2.2
 
 Hide the Dashboard menu, Personal Options section and Help link on the Profile page from your subscribers when they are logged in.
 
 == Description ==
 
-This plugin removes the Dashboard menu, the Personal Options section and the Help link on the Profile page, hides the Dashboard links in the admin bar menu (if activated), and prevents Dashboard access to users assigned to the <em>Subscriber</em> role. Useful if you allow your subscribers to edit their own profiles, but don't want them wandering around your WordPress admin section.
+A simple plugin that removes the Dashboard menu, the Personal Options section and the Help link on the Profile page, hides the Dashboard links in the toolbar menu (if activated), and prevents Dashboard access to users assigned to the <em>Subscriber</em> role. Useful if you allow your subscribers to edit their own profiles, but don't want them wandering around your WordPress admin section.
 
 Users belonging to any of the other WordPress roles will continue to see and have access to the other sections of the WordPress admin that correspond to their role's capabilities.
 
-WP Hide Dashboard has been tested with WordPress in Single user mode, Multisite mode, and with BuddyPress, and works with all of them.
+WP Hide Dashboard has been tested with WordPress in Single mode and Multisite mode, and works with both of them.
 
-<strong>Note: Version 2.1 requires a minimum of WordPress 3.1. If you are running a version less than that, please upgrade your WordPress install before installing or upgrading.</strong>
+<strong>Note: Version 2.2 requires a minimum of WordPress 3.4. If you are running a version less than that, please upgrade your WordPress install before installing or upgrading.</strong>
 
 = Works With: =
 
 The following is a list of plugins that work well (no conflicts) with the WP Hide Dashboard plugin:
 
 * [Members](http://wordpress.org/extend/plugins/members/ "Members") by Justin Tadlock
-* [BuddyPress](http://wordpress.org/extend/plugins/buddypress/ "BuddyPress") by the BuddyPress team
 * [Admin Bar Minimiser](http://wordpress.org/extend/plugins/admin-bar-minimiser/ "Admin Bar Minimiser") by David Gwyer
 * [Logged Out Admin Bar](http://wordpress.org/extend/plugins/logged-out-admin-bar/ "Logged Out Admin Bar") by Peter Westwood
 
@@ -39,7 +38,7 @@ Note: Please let me know if there are other plugins that conflict with WP Hide D
 
 = Support: =
 
-Support is provided at: http://kpdesign.net/wphidedash/
+Support is provided at: http://wphidedash.org/
 
 == Installation ==
 
@@ -70,41 +69,21 @@ If you need to hide admin sidebar menu links from roles other than Subscriber, I
 
 **Q. How do I change this to hide the Dashboard link, Tools menu, Personal Options, and Help options from other roles besides Subscriber?**
 
-A. To hide these from other roles, you will need to edit the plugin in a plain text editor and make the following changes:
-
-**Version 2.1:**
-
-Support for removing other admin menu links has been removed from this version (see response to question above).
-
-**Version 1.5 and 2.0:**
-
-You will need to change the capability (line 44 in version 1.5, and line 46 in version 2.0):
-
-`/* Plugin config - user capability for the top level you want to hide everything from */
-$wphd_user_capability = 'edit_posts'; /* [default for subscriber level = edit_posts] */`
-
-* Subscriber -> Contributor: Change `edit_posts` to `upload_files`
-* Subscriber -> Author: Change `edit_posts` to `manage_categories`
-* Subscriber -> Editor: Change `edit_posts` to `manage_options`
-
-**Version 1.4 and below:**
-
-There are 3 instances of this code in the plugin - make sure you change all of them.
-
-* Subscriber -> Contributor: Change `!current_user_can('edit_posts')` to `!current_user_can('upload_files')`
-* Subscriber -> Author: Change `!current_user_can('edit_posts')` to `!current_user_can('manage_categories')`
-* Subscriber -> Editor: Change `!current_user_can('edit_posts')` to `!current_user_can('manage_options')`
+A. Sorry, I no longer support this plugin working for any role other than Subscriber.
 
 == Screenshots ==
 
-1. WordPress 3.1 default Subscribers profile page (single user - admin bar dropdown showing)
-2. WordPress 3.1 Subscribers profile page with WP Hide Dashboard activated (single user - admin bar dropdown showing)
-3. WordPress 3.1 default Subscribers profile page (Multisite - admin bar showing)
-4. WordPress 3.1 Subscribers profile page with WP Hide Dashboard activated (Multisite - admin bar showing)
-5. WordPress 3.1 website (Multisite - admin bar dropdown showing)
-6. WordPress 3.1 website with WP Hide Dashboard activated (Multisite - admin bar dropdown showing)
+1. WordPress 3.5 default Subscribers profile page and public-facing site (Single)
+2. WordPress 3.5 Subscribers profile page and public-facing site with WP Hide Dashboard activated (Single)
+3. WordPress 3.5 default Subscribers profile page and public-facing site (Multisite)
+4. WordPress 3.5 Subscribers profile page and public-facing site with WP Hide Dashboard activated (Multisite)
 
 == Changelog ==
+
+= Version 2.2: =
+* Support for WordPress version 3.3 and earlier removed.
+* Reworked code to remove fatal error issue, ensure compatibility with WordPress 3.4 and 3.5.
+* Reworked how Multisite user scenarios (assigned to no blogs/1 blog/2+ blogs) are handled.
 
 = Version 2.1: =
 * Support for WordPress version 2.9 and 3.0 removed.
@@ -144,5 +123,5 @@ There are 3 instances of this code in the plugin - make sure you change all of t
 
 == Upgrade Notice ==
 
-= Version 2.1: =
-See changelog for full list of changes: http://wordpress.org/extend/plugins/wp-hide-dashboard/changelog/. Note: This version requires a minimum of WordPress 3.1. If you are running a version less than that, upgrade your WordPress install now, then upgrade to the latest version of the plugin.
+= Version 2.2: =
+See changelog for full list of changes: http://wordpress.org/extend/plugins/wp-hide-dashboard/changelog/. Note: This version requires a minimum of WordPress 3.4. If you are running a version less than that, upgrade your WordPress install now, then upgrade to the latest version of the plugin.
