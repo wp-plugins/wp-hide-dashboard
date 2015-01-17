@@ -35,7 +35,7 @@
 
 // Disallow direct access to the plugin file.
 if ( basename( $_SERVER['PHP_SELF'] ) == basename (__FILE__) ) {
-	wp_die( 'Sorry, but you cannot access this page directly.' );
+	die( 'Sorry, but you cannot access this page directly.' );
 }
 
 /*
