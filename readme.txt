@@ -2,8 +2,8 @@
 Contributors: kpdesign
 Donate link: http://wphidedash.org/donate/
 Tags: admin, admin bar, administration, dashboard, hide, multisite, toolbar
-Requires at least: 3.4
-Tested up to: 4.1
+Requires at least: 3.4.0
+Tested up to: 4.1.0
 Stable tag: 2.2
 
 Hide the Dashboard menu, Personal Options section and Help link on the Profile page from your subscribers when they are logged in.
