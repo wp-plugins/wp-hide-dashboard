@@ -3,7 +3,7 @@ Contributors: kpdesign
 Donate link: http://wphidedash.org/donate/
 Tags: admin, admin bar, administration, dashboard, hide, multisite, toolbar
 Requires at least: 3.4
-Tested up to: 3.5
+Tested up to: 4.1
 Stable tag: 2.2
 
 Hide the Dashboard menu, Personal Options section and Help link on the Profile page from your subscribers when they are logged in.
@@ -57,7 +57,7 @@ If installing the plugin in the `/wp-content/mu-plugins/` directory:
 
 1. Download the plugin and unzip it to a folder on your computer.
 2. Upload the wp-hide-dashboard.php file to the `/wp-content/mu-plugins/` directory.
-3. The plugin will automatically run – there is no activation or configuration needed.
+3. The plugin will automatically run ï¿½ there is no activation or configuration needed.
 
 == Frequently Asked Questions ==
 
