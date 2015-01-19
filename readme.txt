@@ -81,7 +81,7 @@ A. Sorry, I no longer support this plugin working for any role other than Subscr
 
 = Version 2.2.1 =
 * Brought code and comments in line with core standards.
-* DrewAPicture was added as a contributor.
+* DrewAPicture was added as a plugin author.
 * Removed some unused code.
 * General cleanup.
 
